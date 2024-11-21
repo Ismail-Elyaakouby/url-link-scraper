@@ -16,7 +16,6 @@ while getopts "u:o:" opt; do
   esac
 done
 
-# Ensure at least one URL is provided
 if [ "${#urls[@]}" -eq 0 ]; then
   echo "Error: At least one URL must be specified with the -u option."
   echo "Usage: $0 -u <URL> [-u <URL> ...] -o <stdout|json>"
@@ -28,3 +27,18 @@ extract_links() {
   local url="$1"
   curl -s "$url" | grep -oP 'href="https?://[^"]+"' | sed 's/href="//g' | sed 's/"$//g' | sort -u
 }
+
+if [ "$output_format" == "stdout" ]; then
+  for url in "${urls[@]}"; do
+    links=$(extract_links "$url")
+    base_domain=$(echo "$url" | sed -E 's|https?://([^/]+).*|\1|') 
+
+    for link in $links; do
+      if [[ $link == http* ]]; then
+        echo "$link"
+      else
+        echo "https://$base_domain$link"
+      fi
+    done
+  done
+fi

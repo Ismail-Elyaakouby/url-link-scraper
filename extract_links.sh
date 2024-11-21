@@ -41,4 +41,35 @@ if [ "$output_format" == "stdout" ]; then
       fi
     done
   done
+elif [ "$output_format" == "json" ]; then
+  json_output="{"
+  for url in "${urls[@]}"; do
+    links=$(extract_links "$url")
+    base_domain=$(echo "$url" | sed -E 's|https?://([^/]+).*|\1|')
+
+    for link in $links; do
+      if [[ $link == http* ]]; then
+        full_link="$link"
+      else
+        full_link="https://$base_domain$link"
+      fi
+
+      # Extract base URL and path
+      base_url=$(echo "$full_link" | sed -E 's|^(https?://[^/]+).*|\1|')
+      path=$(echo "$full_link" | sed -E 's|https?://[^/]+(.*)|\1|')
+
+      # Convert path into JSON array format
+      path_array=$(echo "$path" | tr "/" "\n" | sed '/^$/d' | awk '{print "\"" $0 "\""}' | paste -sd, -)
+
+      # Append to JSON output
+      if [[ "$json_output" == "{" ]]; then
+        json_output+="\"$base_url\": [$path_array]"
+      else
+        json_output+=", \"$base_url\": [$path_array]"
+      fi
+    done
+  done
+  json_output+="}"
+  
+  echo "$json_output" | sed -E ':a;N;$!ba;s/\n//g' | sed 's/], "/]\n/g'
 fi

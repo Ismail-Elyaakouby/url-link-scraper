@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extract-links-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: extract-links
+  template:
+    metadata:
+      labels:
+        app: extract-links
+    spec:
+      containers:
+        - name: extract-links
+          image: 88915020/extract_links:latest  # Will be replaced with the new image in the pipeline
+          command:
+            - "bash"
+            - "extract_links.sh"
+          args:
+            - "-u"
+            - "http://quotes.toscrape.com/"
+            - "-o"
+            - "stdout"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

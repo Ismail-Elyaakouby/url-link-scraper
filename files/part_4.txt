@@ -1,0 +1,16 @@
+Part 4
+Find at least 2 ways using sed, grep, tr, awk, cut, etc. to solve the following problem.
+..
+
+Solution:
+
+urls="http://tiktok.com
+https://ads.faceBook.com.
+https://sub.ads.faCebook.com
+api.tiktok.com
+Google.com.
+aws.amazon.com"
+
+echo "$urls" | grep -oP 'https?://([a-zA-Z0-9.-]+)' | cut -d'/' -f3 | tr '[:upper:]' '[:lower:]'
+
+or using the scrit found in ../scripts/extract_domains.sh

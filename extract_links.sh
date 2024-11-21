@@ -43,6 +43,7 @@ if [ "$output_format" == "stdout" ]; then
   done
 elif [ "$output_format" == "json" ]; then
   json_output="{"
+
   for url in "${urls[@]}"; do
     links=$(extract_links "$url")
     base_domain=$(echo "$url" | sed -E 's|https?://([^/]+).*|\1|')
@@ -69,9 +70,11 @@ elif [ "$output_format" == "json" ]; then
       fi
     done
   done
+
   json_output+="}"
-  
-  echo "$json_output" | sed -E ':a;N;$!ba;s/\n//g' | sed 's/], "/]\n/g'
+
+  echo "$json_output" | sed 's/\],\s*/],\n/g' | sed 's/}/\n}/g' | sed 's/^{/{\n/g'
+
 else
   echo "Error: Invalid output format. Use 'stdout' or 'json'."
   exit 1

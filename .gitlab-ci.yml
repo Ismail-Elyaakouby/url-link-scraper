@@ -1,52 +1,46 @@
 stages:
-  - build
+  - build_image
   - deploy
 
 variables:
-  DOCKER_REGISTRY: docker.io  # Docker Hub registry
+  DOCKER_REGISTRY: docker.io
   DOCKER_IMAGE: username_id/extract-links:latest  # Replace with your Docker Hub username and image name
-  KUBERNETES_NAMESPACE: default  # Replace with your Kubernetes namespace
+  KUBERNETES_NAMESPACE: default
   KUBERNETES_CLUSTER_CONFIG: /path/to/your/kubeconfig  # Path to your kubeconfig file, default is ${HOME}/.kube/config
-  KUBERNETES_DEPLOYMENT_NAME: extract-links-deployment  # Name of the Kubernetes deployment
+  KUBERNETES_DEPLOYMENT_NAME: extract-links-deployment
   IMAGE_NAME: "extract-links"
   TAG: "v0.0.1"
-  REGISTRY: "88915020"  # Replace with your Docker registry ID
+  REGISTRY: "88915020"  # Replace with own Docker registry ID
 
-# Build the Docker image and push it to Docker Hub
-build:
+build_image:
   stage: build
   image: docker:latest
   services:
-    - docker:19.03.12-dind  # Docker-in-Docker service to enable Docker builds in CI/CD
+    - docker:19.03.12-dind
   before_script:
-    - echo "Starting Docker build process"
+    - echo "Starting Docker build process"s
     - docker info
     - echo "Logging in to Docker registry"
-    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"  # Use GitLab CI/CD secrets for credentials
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - echo "Building ${IMAGE_NAME} image"
     - docker build -t ${REGISTRY}/${IMAGE_NAME}:${TAG} .
     - docker push ${REGISTRY}/${IMAGE_NAME}:${TAG}
   only:
-    - main  # Run the build pipeline on commits to the 'main' branch
+    - main
 
-# Deploy the Docker image to Kubernetes
-# Deploy the Docker image to Kubernetes
 deploy:
   stage: deploy
-  image: google/cloud-sdk:alpine  # Using Google Cloud SDK for Kubernetes interaction
+  image: google/cloud-sdk:alpine
   before_script:
     - echo "Setting up Kubernetes configuration"
     - mkdir -p ~/.kube
-    - cp $KUBERNETES_CLUSTER_CONFIG ~/.kube/config  # Copy kubeconfig to the default location for kubectl
-    - kubectl config use-context my-cluster-context  # Replace with your Kubernetes context
+    - cp $KUBERNETES_CLUSTER_CONFIG ~/.kube/config
+    - kubectl config use-context my-cluster-context
   script:
     - echo "Applying Kubernetes deployment"
-    - sed -i "s|image: .*|image: ${REGISTRY}/${IMAGE_NAME}:${TAG}|g" deployment.yaml  # Dynamically update image in deployment.yaml
+    - sed -i "s|image: .*|image: ${REGISTRY}/${IMAGE_NAME}:${TAG}|g" deployment.yaml
     - kubectl apply -f deployment.yaml --namespace=$KUBERNETES_NAMESPACE
     - kubectl rollout status deployment/$KUBERNETES_DEPLOYMENT_NAME --namespace=$KUBERNETES_NAMESPACE
   only:
-    - main  # Specify the branch for deployment
-  environment:
-    name: production
-    url: https://your-app-url.com  # Optional: URL of your deployed application
+    - main

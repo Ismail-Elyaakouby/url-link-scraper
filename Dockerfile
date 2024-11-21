@@ -9,7 +9,7 @@ RUN apk update && \
     mkdir -p $HOME/scripts && \
     chown -R $USER:$USER $HOME
 
-COPY extract_links.sh $HOME/scripts/extract_links.sh
+COPY scripts/extract_links.sh $HOME/scripts/extract_links.sh
 
 RUN chmod +x $HOME/scripts/extract_links.sh && \
     chown $USER:$USER $HOME/scripts/extract_links.sh

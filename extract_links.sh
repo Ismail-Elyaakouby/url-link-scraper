@@ -72,4 +72,7 @@ elif [ "$output_format" == "json" ]; then
   json_output+="}"
   
   echo "$json_output" | sed -E ':a;N;$!ba;s/\n//g' | sed 's/], "/]\n/g'
+else
+  echo "Error: Invalid output format. Use 'stdout' or 'json'."
+  exit 1
 fi

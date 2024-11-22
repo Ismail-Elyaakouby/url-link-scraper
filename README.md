@@ -123,13 +123,3 @@ The project includes a GitLab CI/CD pipeline (`.gitlab-ci.yml`) to:
 └── scripts/
     └── extract_links.sh      # Bash script to extract links
 ```
-
----
-
-## Author
-
-**Ismail Elyaakouby**  
-A passionate DevOps engineer, cloud computing advocate, and Kubernetes enthusiast. Committed to building scalable, reliable infrastructures and automating workflows to optimize efficiency and performance.
-
-For feedback or collaboration, feel free to contact me via via [GitHub](https://github.com/Ismail-Elyaakouby).
-
